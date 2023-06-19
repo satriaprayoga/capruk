@@ -1,0 +1,12 @@
+package repo
+
+import capruk "github.com/satriaprayoga/capruk/framework"
+
+//repo declare//
+var Repo$MODELNAME$ I$MODELNAME$Repository
+
+func RepoInitializer() {
+	db := capruk.DB
+	// repo init //
+	Repo$MODELNAME$ = New$MODELNAME$Repo(db)
+}

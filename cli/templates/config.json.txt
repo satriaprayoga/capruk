@@ -1,0 +1,50 @@
+{
+    "app_name":"${APP_NAME}",
+    "debug":true,
+    "server":{
+        "host":"localhost",
+        "http_port":9000,
+        "read_timeout":600,
+        "write_timeout":600
+    },
+    "database":{
+        "type": "postgres",
+        "host": "localhost",
+        "port": "5432",
+        "user": "example",
+        "password": "example",
+        "name": "capruk",
+        "table_prefix": ""
+    },
+    "redis":{
+        "host":"127.0.0.1",
+        "port":6379,
+        "db":"",
+        "key":"",
+        "password":""
+    },
+    "smtp":{
+        "server":"",
+        "port":,
+        "sender":"",
+        "user":"",
+        "passwd":"",
+        "Identity":""
+    },
+    "jwt_secret": "${KEY}",
+    "expire_jwt":72,
+    "page_size": 10,
+    "prefix_url": "",
+    "runtime_root_path": "wwwroot/runtime/",
+    "image_save_path": "wwwroot/uploads/images",
+    "image_size": 5,
+    "image_allow_ext": ".jpg,.jpeg,.png",
+    "export_save_path": "wwwroot/export/",
+    "qr_code": "wwwroot/qr_code/",
+    "log_save_path": "logs/",
+    "log_save_name": "log",
+    "log_file_ext": "log",
+    "time_format": 20060102,
+    "issuer": "${APP_NAME}",
+    "url_forgot_password":""
+}

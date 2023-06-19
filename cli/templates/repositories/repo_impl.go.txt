@@ -1,0 +1,156 @@
+package repo
+
+import (
+	"$APP_NAME$/models"
+    "github.com/satriaprayoga/capruk/database"
+	capruk "github.com/satriaprayoga/capruk/framework"
+	"gorm.io/gorm"
+    "errors"
+)
+
+type $MODELNAME$Repo struct {
+	Db *gorm.DB
+}
+
+func New$MODELNAME$Repo() *$MODELNAME$Repo {
+	return &$MODELNAME$Repo{Db:capruk.DB}
+}
+
+var _ I$MODELNAME$Repository=New$MODELNAME$Repo()
+
+func ($modelname$Repo *$MODELNAME$Repo) Create(data *models.$MODELNAME$) error {
+	var (
+		err error
+	)
+
+	q := $modelname$Repo.Db.Create(data)
+	err = q.Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ($modelname$Repo *$MODELNAME$Repo) Update(ID int, data interface{}) error {
+	var (
+		err error
+	)
+	q := $modelname$Repo.Db.Model(models.$MODELNAME${}).Where("$modelname$_id=?", ID).Updates(data)
+
+	err = q.Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func ($modelname$Repo *$MODELNAME$Repo) GetDataBy(ID int) (result *models.$MODELNAME$, err error) {
+	var (
+		data = &models.$MODELNAME${}
+	)
+
+	q := $modelname$Repo.Db.Where("$modelname$_id=?", ID).Find(&data)
+	err = q.Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return result, errors.New("result not found")
+		}
+		return result, err
+	}
+	return data, nil
+}
+
+func ($modelname$Repo *$MODELNAME$Repo) GetList(queryparam database.ParamList) (result []*models.$MODELNAME$, err error) {
+	var (
+		pageNum  = 0
+		pageSize = capruk.Config.PageSize
+		sWhere   = ""
+		orderBy  = queryparam.SortField
+	)
+	// pagination
+	if queryparam.Page > 0 {
+		pageNum = (queryparam.Page - 1) * queryparam.PerPage
+	}
+	if queryparam.PerPage > 0 {
+		pageSize = queryparam.PerPage
+	}
+	//end pagination
+
+	// Order
+	if queryparam.SortField != "" {
+		orderBy = queryparam.SortField
+	}
+	//end Order by
+
+	//WHERE
+	if queryparam.InitSearch != "" {
+		sWhere = queryparam.InitSearch
+	}
+
+	if queryparam.Search != "" {
+		if sWhere != "" {
+			sWhere += " and " + queryparam.Search
+		} else {
+			sWhere += queryparam.Search
+		}
+	}
+
+	//end where
+
+	if pageNum >= 0 && pageSize > 0 {
+		query := $modelname$Repo.Db.Where(sWhere).Offset(pageNum).Limit(pageSize).Order(orderBy).Find(&result)
+
+		err = query.Error
+	} else {
+		query := $modelname$Repo.Db.Where(sWhere).Order(orderBy).Find(&result)
+		err = query.Error
+	}
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, err
+		}
+		return nil, err
+	}
+	return result, nil
+}
+
+func ($modelname$Repo *$MODELNAME$Repo) Count(querparam database.ParamList) (result int, err error) {
+	var (
+		sWhere        = ""
+		_result int64 = 0
+	)
+
+	//WHERE
+	if querparam.InitSearch == "" {
+		sWhere = querparam.InitSearch
+	}
+
+	if querparam.Search != "" {
+		if sWhere != "" {
+			sWhere += " and " + querparam.Search
+		}
+	}
+
+	query := $modelname$Repo.Db.Model(&models.$MODELNAME${}).Where(sWhere).Count(&_result)
+	err = query.Error
+	if err != nil {
+		return 0, err
+	}
+	return int(_result), nil
+}
+
+func ($modelname$Repo *$MODELNAME$Repo) Delete(ID int) error {
+	var (
+		err error
+	)
+	query := $modelname$Repo.Db.Where("$modelname$_id=?", ID).Delete(&models.$MODELNAME${})
+	err = query.Error
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+

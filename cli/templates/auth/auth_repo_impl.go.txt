@@ -1,0 +1,177 @@
+package repo
+
+import (
+	"$APP_NAME$/models"
+    "github.com/satriaprayoga/capruk/database"
+	capruk "github.com/satriaprayoga/capruk/framework"
+	"gorm.io/gorm"
+    "errors"
+)
+
+type UserRepo struct {
+	Conn *gorm.DB
+}
+
+func NewUserRepo() *UserRepo {
+	return &UserRepo{Conn:capruk.DB}
+}
+
+var _ IUserRepository=NewUserRepo()
+
+func (r *UserRepo) Create(data *models.User) error {
+	var (
+		err    error
+	)
+	q := r.Conn.Create(data)
+	err = q.Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *UserRepo) Update(ID int, data interface{}) error {
+	var (
+		err    error
+	)
+	q := r.Conn.Model(models.User{}).Where("user_id=?", ID).Updates(data)
+	err = q.Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *UserRepo) GetByAccount(account string, userType string) (result models.User, err error) {
+	
+	query := r.Conn.Where("email LIKE ? OR telp=? AND user_type=?", account, account, userType).Find(&result)
+	
+	err = query.Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return result, errors.New("result not found")
+		}
+		return result, err
+	}
+	return result, err
+}
+func (db *UserRepo) UpdatePasswordByEmail(Email string, Password string) error {
+	var (
+		
+		err    error
+	)
+	query := db.Conn.Exec(`UPDATE k_user set password = ? AND email = ?`, Password, Email)
+	err = query.Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *UserRepo) GetDataBy(ID int) (result *models.User, err error) {
+	var (
+		User = &models.User{}
+	)
+
+	query := db.Conn.Where("user_id=?", ID).Find(&User)
+    err=query.Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return result, errors.New("result not found")
+		}
+		return result, err
+	}
+	return User, nil
+}
+
+func (db *UserRepo) GetList(queryparam database.ParamList) (result []*models.User, err error) {
+	var (
+		pageNum  = 0
+		pageSize = capruk.Config.PageSize
+		sWhere   = ""
+		orderBy  = queryparam.SortField
+	)
+	// pagination
+	if queryparam.Page > 0 {
+		pageNum = (queryparam.Page - 1) * queryparam.PerPage
+	}
+	if queryparam.PerPage > 0 {
+		pageSize = queryparam.PerPage
+	}
+	//end pagination
+
+	// Order
+	if queryparam.SortField != "" {
+		orderBy = queryparam.SortField
+	}
+	//end Order by
+
+	//WHERE
+	if queryparam.InitSearch != "" {
+		sWhere = queryparam.InitSearch
+	}
+
+	if queryparam.Search != "" {
+		if sWhere != "" {
+			sWhere += " and " + queryparam.Search
+		} else {
+			sWhere += queryparam.Search
+		}
+	}
+
+	//end where
+
+	if pageNum >= 0 && pageSize > 0 {
+		query := db.Conn.Where(sWhere).Offset(pageNum).Limit(pageSize).Order(orderBy).Find(&result)
+		err = query.Error
+	} else {
+		query := db.Conn.Where(sWhere).Order(orderBy).Find(&result)
+		err = query.Error
+	}
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, err
+		}
+		return nil, err
+	}
+	return result, nil
+}
+
+func (db *UserRepo) Count(querparam database.ParamList) (result int, err error) {
+	var (
+		sWhere        = ""
+		_result int64 = 0
+	)
+
+	//WHERE
+	if querparam.InitSearch == "" {
+		sWhere = querparam.InitSearch
+	}
+
+	if querparam.Search != "" {
+		if sWhere != "" {
+			sWhere += " and " + querparam.Search
+		}
+	}
+
+	query := db.Conn.Model(&models.User{}).Where(sWhere).Count(&_result)
+	err = query.Error
+	if err != nil {
+		return 0, err
+	}
+	return int(_result), nil
+}
+
+func (db *UserRepo) Delete(ID int) error {
+	var (
+		err    error
+	)
+	query := db.Conn.Where("user_id=?", ID).Delete(&models.User{})
+	err = query.Error
+	if err != nil {
+		return err
+	}
+	return nil
+
+}

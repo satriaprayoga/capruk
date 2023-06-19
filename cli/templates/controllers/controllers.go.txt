@@ -1,0 +1,28 @@
+package controllers
+
+import (
+   	"context"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+	capruk "github.com/satriaprayoga/capruk/framework"
+)
+
+type $CONTNAME$Controller struct{
+
+}
+
+func Setup(){
+    $contname$c:=&$CONTNAME$Controller{}
+    capruk.GET("/$contname$",$contname$c.Index)
+}
+
+func ($contname$C *$CONTNAME$Controller) Index(e echo.Context) (error){
+    ctx:=e.Request().Context()
+    if ctx==nil{
+        ctx=context.Background()
+    }
+
+    var resp=capruk.Res{R:e}
+    return resp.Response(http.StatusOK, "Ok", "OK")
+}

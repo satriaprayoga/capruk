@@ -1,0 +1,17 @@
+package repo
+
+import (
+    "$APP_NAME$/models"
+    "github.com/satriaprayoga/capruk/database"
+)
+
+type IUserRepository interface {
+	Create(data *models.User) error
+	Update(ID int, data interface{}) error
+	GetByAccount(account string, userType string) (result models.User, err error)
+	UpdatePasswordByEmail(Email string, Password string) error
+	GetDataBy(ID int) (result *models.User, err error)
+	GetList(queryparam database.ParamList) (result []*models.User, err error)
+	Count(querparam database.ParamList) (result int, err error)
+	Delete(ID int) error
+}

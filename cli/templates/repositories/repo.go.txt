@@ -1,0 +1,15 @@
+package repo
+
+import (
+    "$APP_NAME$/models"
+    "github.com/satriaprayoga/capruk/database"
+)
+
+type I$MODELNAME$Repository interface {
+	Create(data *models.$MODELNAME$) error
+	Update(ID int, data interface{}) error
+	GetDataBy(ID int) (result *models.$MODELNAME$, err error)
+	GetList(queryparam database.ParamList) (result []*models.$MODELNAME$, err error)
+	Count(querparam database.ParamList) (result int, err error)
+	Delete(ID int) error
+}
