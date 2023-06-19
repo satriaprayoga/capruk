@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/labstack/echo/v4 v4.10.2
-	github.com/satriaprayoga/capruk v0.0.0-00010101000000-000000000000
+	github.com/satriaprayoga/capruk v1.0.0
 	gorm.io/gorm v1.25.1
 )
 
