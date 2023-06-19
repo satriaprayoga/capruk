@@ -25,7 +25,7 @@
     },
     "smtp":{
         "server":"",
-        "port":,
+        "port":"",
         "sender":"",
         "user":"",
         "passwd":"",
